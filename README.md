@@ -1,4 +1,4 @@
-# 🎭 **Facial Expression Analysis**  
+# 🎭 **Facial Expression Recognition**  
 
 This project explores **facial expression recognition** using deep learning and facial landmarks. The goal is to classify human emotions, **happiness, sadness, and surprise** from facial images.  
 
@@ -59,7 +59,7 @@ The model was trained on **facial landmarks** extracted using **MediaPipe Face M
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/fccamello/Facial-Expression-Analysis.git
+git clone https://github.com/fccamello/Facial-Expression-Recognition.git
 cd Facial-Expression-Analysis
 
 # 2. Run the app (loads pre-trained model and makes predictions)
