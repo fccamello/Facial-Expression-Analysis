@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Expression Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Facial Expression Recognition</h1>
+        
+        <div class="game-info">
+            <div id="round">Round 1 / 10</div>
+            <div id="target">Target: </div>
+            <div id="status">Waiting...</div>
+        </div>
+        
+        <div class="video-container">
+            <video id="video" width="640" height="480" autoplay muted></video>
+            <div class="video-overlay"></div>
+        </div>
+    </div>
+
+    <script>
+        const expressions = ["happy", "sad", "surprise"];
+        let currentRound = 1;
+        const totalRounds = 10;
+        let targetExpression = "";
+        const roundDiv = document.getElementById('round');
+        const targetDiv = document.getElementById('target');
+        const statusDiv = document.getElementById('status');
+        const video = document.getElementById('video');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            return new Promise(resolve => {
+                video.onloadedmetadata = () => { resolve(video); };
+            });
+        }
+
+        function getRandomExpression() {
+            return expressions[Math.floor(Math.random() * expressions.length)];
+        }
+
+        async function sendFrame() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+            const formData = new FormData();
+            formData.append('frame', blob, 'frame.jpg');
+
+            const response = await fetch('/predict_video', { method: 'POST', body: formData });
+            const data = await response.json();
+            return data.label;
+        }
+
+        function showBalloons() {
+            for (let i = 0; i < 30; i++) {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                balloon.style.left = `${Math.random() * 100}%`;
+                balloon.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                balloon.style.animationDelay = `${Math.random() * 3}s`;
+                document.body.appendChild(balloon);
+
+                setTimeout(() => document.body.removeChild(balloon), 10000);
+            }
+        }
+
+        async function playRound() {
+            targetExpression = getRandomExpression();
+            targetDiv.textContent = `Target: ${targetExpression}`;
+            statusDiv.className = ''; 
+
+            const interval = setInterval(async () => {
+                const predicted = await sendFrame();
+                statusDiv.textContent = `Detected: ${predicted}`;
+
+                if (predicted === targetExpression) {
+                    clearInterval(interval);
+                    statusDiv.textContent = "Correct!";
+                    statusDiv.classList.add('correct');
+
+                    if (currentRound < totalRounds) {
+                        currentRound++;
+                        roundDiv.textContent = `Round ${currentRound} / ${totalRounds}`;
+                        setTimeout(playRound, 2000);
+                    } else {
+                        statusDiv.textContent = "WOWOWOWOWO! You Win!";
+                        showBalloons();
+                    }
+                }
+            }, 1000);
+        }
+
+        setupCamera().then(() => {
+            playRound();
+        });
+    </script>
+</body>
+</html>
