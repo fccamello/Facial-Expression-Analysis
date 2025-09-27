@@ -1,6 +1,6 @@
 # 🎭 **Facial Expression Analysis**  
 
-This project explores **facial expression recognition** using deep learning and facial landmarks. The goal is to classify human emotions—**happiness, sadness, and surprise**—from facial images.  
+This project explores **facial expression recognition** using deep learning and facial landmarks. The goal is to classify human emotions, **happiness, sadness, and surprise** from facial images.  
 
 📂 **Dataset Source:** [Kaggle – Facial Expressions (Happiness, Sadness, Surprise)](https://www.kaggle.com/datasets/denisleu/facial-expressions-happiness-sadness-surprise)  
 
